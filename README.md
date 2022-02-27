@@ -1,6 +1,6 @@
 # RobustMotionPlanning
 
-
+ install point-cloud to laser scan package through ros noetic
 to  run gmapping using ros
 
 install ros-gmapping
