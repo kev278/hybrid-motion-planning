@@ -25,6 +25,6 @@
     <arg name="model" value="$(arg model)"/>
   </include>
   <include file="$(find turtlebot3_navigation)/launch/amcl.launch" />
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_gazebo)/rviz/turtlebot3_gazebo_model.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find robust_planning)/config.rviz"/>
 
 </launch>
