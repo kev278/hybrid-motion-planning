@@ -1,28 +1,28 @@
 #include <pluginlib/class_list_macros.h>
-#include "robust_planner.h"
+#include "hybrid_local_planner.h"
 #include <tf2/convert.h>
 #include <tf2/utils.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 
-// register this planner as a BaseRobustPlanner plugin
-PLUGINLIB_EXPORT_CLASS(robust_planner::RobustPlanner, nav_core::BaseGlobalPlanner)
+// register this planner as a BaseHybridLocalPlanner plugin
+PLUGINLIB_EXPORT_CLASS(hybrid_planner::HybridLocalPlanner, nav_core::BaseGlobalPlanner)
 
 using namespace std;
 
 // Default Constructor
-namespace robust_planner
+namespace hybrid_planner
 {
 
-    RobustPlanner::RobustPlanner()
+    HybridLocalPlanner::HybridLocalPlanner()
         : costmap_ros_(NULL), costmap_(NULL), world_model_(NULL), initialized_(false) {}
 
-    RobustPlanner::RobustPlanner(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
+    HybridLocalPlanner::HybridLocalPlanner(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
         : costmap_ros_(NULL), costmap_(NULL), world_model_(NULL), initialized_(false)
     {
         initialize(name, costmap_ros);
     }
 
-    void RobustPlanner::initialize(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
+    void HybridLocalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
     {
         if (!initialized_)
         {
@@ -41,11 +41,11 @@ namespace robust_planner
             ROS_WARN("This planner has already been initialized... doing nothing");
     }
 
-    bool RobustPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &plan)
+    bool HybridLocalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &plan)
     {
 
         plan.push_back(start);
-        ROS_WARN("Robust Planner is making plan");
+        ROS_WARN("Hybrid Local Planner is making plan");
         for (int i = 0; i < 20; i++)
         {
             geometry_msgs::PoseStamped new_goal = goal;

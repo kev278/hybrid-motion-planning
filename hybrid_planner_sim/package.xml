@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>robust_planner</name>
+  <name>hybrid_planner_sim</name>
   <version>0.0.0</version>
-  <description>The robust_planner package</description>
+  <description>The hybrid_planner_sim package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/robust_planner</url> -->
+  <!-- <url type="website">http://wiki.ros.org/hybrid_planner_sim</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -49,55 +49,22 @@
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>nav_msgs</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
-  <build_depend>angles</build_depend>
+
   <build_depend>turtlebot3_gazebo</build_depend>
-  <build_export_depend>nav_msgs</build_export_depend>
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>angles</build_export_depend>
   <build_export_depend>turtlebot3_gazebo</build_export_depend>
-  <exec_depend>nav_msgs</exec_depend>
   <exec_depend>roscpp</exec_depend>
   <exec_depend>rospy</exec_depend>
-  <exec_depend>angles</exec_depend>
+
   <exec_depend>turtlebot3_gazebo</exec_depend>
-  
-  <exec_depend>base_local_planner</exec_depend>
-  <build_depend>base_local_planner</build_depend>
-  <build_export_depend>base_local_planner</build_export_depend>
-  
-    <exec_depend>costmap_2d</exec_depend>
-  <build_depend>costmap_2d</build_depend>
-  <build_export_depend>costmap_2d</build_export_depend>
-
-  <exec_depend>nav_core</exec_depend>
-  <build_depend>nav_core</build_depend>
-  <build_export_depend>nav_core</build_export_depend>
-  
-    <exec_depend>pluginlib</exec_depend>
-  <build_depend>pluginlib</build_depend>
-  <build_export_depend>pluginlib</build_export_depend>
-  
-    <exec_depend>tf2</exec_depend>
-  <build_depend>tf2</build_depend>
-  <build_export_depend>tf2</build_export_depend>
-  
-    <exec_depend>tf2_geometry_msgs</exec_depend>
-  <build_depend>tf2_geometry_msgs</build_depend>
-  <build_export_depend>tf2_geometry_msgs</build_export_depend>
-
-  <exec_depend>tf2_ros</exec_depend>
-  <build_depend>tf2_ros</build_depend>
-  <build_export_depend>tf2_ros</build_export_depend>
 
 
-
-
-
+  <!-- The export tag contains other, unspecified, tags -->
   <export>
-  <nav_core plugin="${prefix}/robust_planner_plugin.xml" />
+    <!-- Other tools can request additional information be placed here -->
+
   </export>
 </package>

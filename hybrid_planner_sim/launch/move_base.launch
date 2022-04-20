@@ -7,7 +7,7 @@
 
   <!-- move_base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="base_global_planner" value="robust_planner/RobustPlanner" />
-     <rosparam file="$(find robust_planner)/costmap_params.yaml" command="load" />
+    <param name="base_global_planner" value="hybrid_planner/HybridGlobalPlanner" />
+     <rosparam file="$(find hybrid_global_planner)/costmap_params.yaml" command="load" />
   </node>
 </launch>

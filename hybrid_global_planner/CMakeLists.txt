@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(robust_planner)
+project(hybrid_global_planner)
 
 find_package(catkin REQUIRED
   COMPONENTS
@@ -23,7 +23,7 @@ add_definitions(${EIGEN3_DEFINITIONS})
 
 catkin_package(
   INCLUDE_DIRS include
-  LIBRARIES robust_planner
+  LIBRARIES hybrid_global_planner
   CATKIN_DEPENDS
     angles
     base_local_planner
@@ -37,7 +37,7 @@ catkin_package(
 
 
 add_library(${PROJECT_NAME}
-  src/robust_planner.cpp
+  src/hybrid_global_planner.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -46,7 +46,7 @@ target_link_libraries(${PROJECT_NAME}
 
 
 install(
-  FILES robust_planner_plugin.xml
+  FILES hybrid_global_planner_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 

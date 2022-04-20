@@ -1,0 +1,5 @@
+ <library path="lib/libhybrid_global_planner">
+  <class name="hybrid_planner/HybridGlobalPlanner" type="hybrid_planner::HybridGlobalPlanner" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>This is a hybrid global planner plugin by Group 5</description>
+  </class>
+ </library>

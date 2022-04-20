@@ -11,17 +11,17 @@
 
 using std::string;
 
-#ifndef GLOBAL_PLANNER_CPP
-#define GLOBAL_PLANNER_CPP
+#ifndef HYBRID_GLOBAL_PLANNER_CPP
+#define HYBRID_GLOBAL_PLANNER_CPP
 
-namespace robust_planner
+namespace hybrid_planner
 {
 
-    class RobustPlanner : public nav_core::BaseGlobalPlanner
+    class HybridGlobalPlanner : public nav_core::BaseGlobalPlanner
     {
     public:
-        RobustPlanner();
-        RobustPlanner(std::string name, costmap_2d::Costmap2DROS *costmap_ros);
+        HybridGlobalPlanner();
+        HybridGlobalPlanner(std::string name, costmap_2d::Costmap2DROS *costmap_ros);
 
         /** overridden classes from interface nav_core::BaseGlobalPlanner **/
         void initialize(std::string name, costmap_2d::Costmap2DROS *costmap_ros);
