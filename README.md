@@ -13,12 +13,14 @@ rosrun gmapping slam_gmapping scan:=/laser_scan _base_frame:=ego_vehicle _map_up
 Install Turtlebot3 packages
 
 ```sh
-apt-get install ros-noetic-turtlebot3
-apt-get install ros-noetic-turtlebot3-gazebo
+sudo apt-get install ros-noetic-turtlebot3
+sudo apt-get install ros-noetic-turtlebot3-gazebo
+sudo apt-get install ros-noetic-base-local-planner
+sudo apt-get install ros-noetic-nav-core
 ```
 
 ```sh 
-roslaunch robust_planner  turtlebot3_world.launch
+roslaunch hybrid_planner_sim  turtlebot3_world.launch
 ```
 
 To see example of planning: 
