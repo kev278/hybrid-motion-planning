@@ -15,3 +15,10 @@ dependency for prius
 
  sudo apt install libignition-msgs-dev
 
+
+## Running the simulation
+
+```sh 
+roslaunch turtlebot3_gazebo  turtlebot3_house.launch```
+
+
