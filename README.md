@@ -23,6 +23,7 @@ roslaunch robust_planner  turtlebot3_world.launch
 ```
 
 To see example of planning: 
+
 rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped "header:
   seq: 0
   stamp:
