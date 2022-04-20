@@ -14,7 +14,7 @@ Install Turtlebot3 packages
 
 ```sh
 apt-get install ros-noetic-turtlebot3
-apt-get install ros-noetic-turtlebot3_gazebo
+apt-get install ros-noetic-turtlebot3-gazebo
 ```
 
 ```sh 
