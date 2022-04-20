@@ -1,0 +1,5 @@
+ <library path="lib/librobust_planner">
+  <class name="robust_planner/RobustPlanner" type="robust_planner::RobustPlanner" base_class_type="nav_core::BaseGlobalPlanner">
+    <description>This is a robust planner plugin by iroboapp project.</description>
+  </class>
+ </library>
