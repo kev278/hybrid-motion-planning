@@ -12,8 +12,11 @@ rosrun gmapping slam_gmapping scan:=/laser_scan _base_frame:=ego_vehicle _map_up
 ## Running the simulation
 
 Install Turtlebot3 packages
+
+```sh
 apt-get install ros-noetic-turtlebot3
 apt-get install ros-noetic-turtlebot3_gazebo
+```
 
 ```sh 
 roslaunch robust_planner  turtlebot3_world.launch
