@@ -9,14 +9,11 @@ install ros-gmapping
 rosrun gmapping slam_gmapping scan:=/laser_scan _base_frame:=ego_vehicle _map_update_interval:=0.5
 
 
-
-
-dependency for prius
-
- sudo apt install libignition-msgs-dev
-
-
 ## Running the simulation
+
+Install Turtlebot3 packages
+apt-get install ros-noetic-turtlebot3
+apt-get install ros-noetic-turtlebot3_gazebo
 
 ```sh 
 roslaunch robust_planner  turtlebot3_world.launch
