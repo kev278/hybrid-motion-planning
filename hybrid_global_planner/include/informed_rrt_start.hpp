@@ -51,7 +51,7 @@ class RRT
 
     std::pair<double, double> get_new_point(double goal_bias)
     {
-        
+        //Geerate a pair of random numbers
     }
 
     std::pair<double, double> get_new_point_in_ellipsoid(double goal_bias, double c_best)
@@ -163,7 +163,6 @@ class RRT
                 }
             }
             return new_node;
-
         }
 
         else
@@ -173,6 +172,41 @@ class RRT
 
     std::vector<Node*> get_neighbors(Node* new_node, int neighbor_size)
     {
+        std::pair<double, double> sample;
+        std::vector<std::pair<double, double>> samples;
+        std::vector<Node*>::iterator itr;
+        double row{0}, col{0};
+        for(itr = vertices.begin(); itr < vertices.end(); itr++)
+        {
+            row = (*itr)->row;
+            col = (*itr)->col;
+            sample = {row, col};
+            samples.push_back(sample);
+        }
+
+        std::vector<std::pair<double, double>>::iterator vec_itr;
+        std::vector<int> neighbors_indices;
+        int count{0};
+        for(vec_itr = samples.begin(); vec_itr < samples.end(); itr++)
+        {
+            if(sqrt(pow((*vec_itr).first - new_node->row, 2) + pow((*vec_itr).second - new_node->col, 2)) < neighbor_size)
+            {
+                neighbors_indices.push_back(count);
+            }
+            count++;
+        }
+
+        std::vector<Node*> neighbors;
+        //Add nodes from vertices to neighbors at all indices in neighbors_indices
+        std::vector<int>::iterator indices_itr;
+        for(indices_itr = neighbors_indices.begin(); indices_itr < neighbors_indices.end(); indices_itr++)
+        {
+            neighbors.push_back(vertices[(*indices_itr)]);
+        }
+
+        return neighbors;        
+        //Remove the new node
+
 
     }
 
@@ -215,8 +249,6 @@ class RRT
         }
 
 
-
-
     }
 
     void informed_RRT_star(int n_pts, int neigbor_size)
@@ -256,8 +288,6 @@ class RRT
         }
         
     }
-
-
 };
 
 int main()
