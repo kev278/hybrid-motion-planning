@@ -1,57 +1,36 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 2.8.3)
 project(hybrid_local_planner)
 
-find_package(catkin REQUIRED
-  COMPONENTS
-    angles
-    base_local_planner
-    costmap_2d
-    nav_core
-    pluginlib
-    roscpp
-    tf2
-    tf2_geometry_msgs
-    tf2_ros
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  rospy
+  std_msgs
 )
-
-include_directories(
-    include 
-    ${catkin_INCLUDE_DIRS}
-    )
- 
-add_definitions(${EIGEN3_DEFINITIONS})
 
 catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES hybrid_local_planner
-  CATKIN_DEPENDS
-    angles
-    base_local_planner
-    costmap_2d
-    nav_core
-    pluginlib
-    roscpp
-    tf2
-    tf2_ros
+
 )
 
 
-add_library(${PROJECT_NAME}
+include_directories(
+  include
+  ${Eigen_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+)
+
+## Declare a C++ library
+add_library(hybrid_local_planner
   src/hybrid_local_planner.cpp
-)
-
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+ )
 
 
+target_link_libraries(hybrid_local_planner
+   ${catkin_LIBRARIES}
+ )
 install(
   FILES hybrid_local_planner_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
-  include_directories(
-    include
-    ${catkin_INCLUDE_DIRS}
-  )
-
+set(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")

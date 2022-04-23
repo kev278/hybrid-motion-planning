@@ -26,6 +26,7 @@ namespace hybrid_planner
     {
         if (!initialized_)
         {
+            ROS_WARN("Global initialization");
             costmap_ros_ = costmap_ros;            // initialize the costmap_ros_ attribute to the parameter.
             costmap_ = costmap_ros_->getCostmap(); // get the costmap_ from costmap_ros_
 
@@ -38,19 +39,14 @@ namespace hybrid_planner
             initialized_ = true;
         }
         else
-            ROS_WARN("This planner has already been initialized... doing nothing");
+            ROS_WARN("The global planner has already been initialized... doing nothing");
     }
 
     bool HybridGlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &plan)
     {
 
         plan.push_back(start);
-        ROS_WARN("Hybrid Global Planner is making plan");
-        for (int i = 0; i < 20; i++)
-        {
-            geometry_msgs::PoseStamped new_goal = goal;
-            plan.push_back(new_goal);
-        }
+        ROS_WARN_STREAM("Start pose is " << start);
         plan.push_back(goal);
         return true;
     }

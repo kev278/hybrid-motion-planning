@@ -1,57 +1,62 @@
-#include <pluginlib/class_list_macros.h>
 #include "hybrid_local_planner.h"
-#include <tf2/convert.h>
-#include <tf2/utils.h>
-#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <pluginlib/class_list_macros.h>
 
-// register this planner as a BaseHybridLocalPlanner plugin
-PLUGINLIB_EXPORT_CLASS(hybrid_planner::HybridLocalPlanner, nav_core::BaseGlobalPlanner)
 
-using namespace std;
+PLUGINLIB_EXPORT_CLASS(hybrid_planner::HybridLocalPlanner, nav_core::BaseLocalPlanner)
 
-// Default Constructor
-namespace hybrid_planner
-{
 
-    HybridLocalPlanner::HybridLocalPlanner()
-        : costmap_ros_(NULL), costmap_(NULL), world_model_(NULL), initialized_(false) {}
+namespace hybrid_planner {
 
-    HybridLocalPlanner::HybridLocalPlanner(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
-        : costmap_ros_(NULL), costmap_(NULL), world_model_(NULL), initialized_(false)
-    {
-        initialize(name, costmap_ros);
-    }
+HybridLocalPlanner::HybridLocalPlanner()
+    : costmap_ros_(NULL), tf_(NULL), initialized_(false) {}
 
-    void HybridLocalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
-    {
-        if (!initialized_)
-        {
-            costmap_ros_ = costmap_ros;            // initialize the costmap_ros_ attribute to the parameter.
-            costmap_ = costmap_ros_->getCostmap(); // get the costmap_ from costmap_ros_
+HybridLocalPlanner::HybridLocalPlanner(std::string name, tf2_ros::Buffer *tf,
+                           costmap_2d::Costmap2DROS *costmap_ros)
+    : costmap_ros_(NULL), tf_(NULL), initialized_(false) {
+  initialize(name, tf, costmap_ros);
+}
 
-            // initialize other planner parameters
-            ros::NodeHandle private_nh("~/" + name);
-            private_nh.param("step_size", step_size_, costmap_->getResolution());
-            private_nh.param("min_dist_from_robot", min_dist_from_robot_, 0.10);
-            world_model_ = new base_local_planner::CostmapModel(*costmap_);
+HybridLocalPlanner::~HybridLocalPlanner() {}
 
-            initialized_ = true;
-        }
-        else
-            ROS_WARN("This planner has already been initialized... doing nothing");
-    }
+void HybridLocalPlanner::initialize(std::string name, tf2_ros::Buffer *tf,
+                              costmap_2d::Costmap2DROS *costmap_ros) {
+  if (!initialized_) {
+    initialized_ = true;
+  }
+}
 
-    bool HybridLocalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &plan)
-    {
+bool HybridLocalPlanner::setPlan(
+    const std::vector<geometry_msgs::PoseStamped> &orig_global_plan) {
+  if (!initialized_) {
+    ROS_ERROR(
+        "The local planner has not been initialized, please call initialize() "
+        "before using this planner");
+    return false;
+  }
+  
+  return true;
+}
 
-        plan.push_back(start);
-        ROS_WARN("Hybrid Local Planner is making plan");
-        for (int i = 0; i < 20; i++)
-        {
-            geometry_msgs::PoseStamped new_goal = goal;
-            plan.push_back(new_goal);
-        }
-        plan.push_back(goal);
-        return true;
-    }
-};
+bool HybridLocalPlanner::computeVelocityCommands(geometry_msgs::Twist &cmd_vel) {
+  if (!initialized_) {
+    ROS_ERROR(
+        "The local planner has not been initialized, please call initialize() "
+        "before using this planner");
+    return false;
+  }
+  //keep sending positive velocity commands until goal is reached.
+  cmd_vel.linear.x = 0.01;
+  return true;
+}
+
+bool HybridLocalPlanner::isGoalReached() {
+  if (!initialized_) {
+    ROS_ERROR(
+        "This local planner has not been initialized, please call initialize() "
+        "before using this planner");
+    return false;
+  }
+
+  return false;
+}
+}  // namespace hybrid_planner
