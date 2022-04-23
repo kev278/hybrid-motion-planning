@@ -10,13 +10,20 @@ path - std::vector<geometry_msgs>
 #include <cmath>
 #include <iostream>
 #include <Eigen/Dense>
+#include <ros/ros.h>
+#include <nav_msgs/OccupancyGrid.h>
+#include <random>
 
 using Eigen::MatrixXd;
 
-class Node
+void costmap_callback(const nav_msgs/OccupancyGrid::ConstPtr& msg)
+{
+    
+}
+
+struct Node
 {
     public:
-
     double row;
     double col;
     Node* parent;
@@ -25,40 +32,98 @@ class Node
 
 class RRT
 {
+    RRT(Node* start_, Node* goal_, auto costmap_2d::Costmap2D *global_costmap_)
+    {
+        ros::NodeHandle n;
+        ros::Subscriber sub = n.subscribe("nav_msgs/global_costmap/costmap", 1, costmap_callback);   
+        global_costmap = global_costmap_;
+        size_row = gloabl_costmap->getSizeInCellsX();
+        size_col = global_costmap->getSizeInCellsY();
+        vertices.push_back(start_);
+        start = start_;
+        goal = goal_;
+    }
+
     // Cost Map
+    // Working with Cell indexes
     int size_row;
     int size_col;
     Node* start;
     Node* goal;
     std::vector<Node*> vertices;
     bool found{false};
-
-    void init_map()
-    {
-
-    }
+    costmap_2d::Costmap2D *global_costmap;
 
     double dis(Node* node1, Node* node2)
     {
         return sqrt(pow((node1->row - node2->row), 2) + pow((node1->col - node2->col), 2));
-
     }
 
+    bool CollisionDetector::isThisPointCollides(double wx, double wy) {
+        // In case of no costmap loaded
+        if (global_costmap == nullptr) {
+            // no collision
+            return false;
+        }
+
+        int mx{0}, my{0};
+        worldToMap(wx, wy, mx, my);
+
+        if ((mx < 0) || (my < 0) || (mx >= global_costmap->getSizeInCellsX()) || (my >= global_costmap->getSizeInCellsY()))
+            return true;
+
+        // getCost returns unsigned char
+        unsigned int cost = static_cast<int>(global_costmap->getCost(mx, my));
+
+        if (cost > 0)
+            return true;
+
+        return false;
+    }
+    //Node 2 is the new point
     bool check_collision(Node* node1, Node* node2)
     {
-        //To be done
+        // In case of no costmap loaded
+        if (global_costmap == nullptr) {
+            // there is NO obstacles
+            return false;
+        }
+
+        double dist = dis(node1, node2);
+        resolution_;
+
+        if (dist < resolution_) {
+            return (isThisPointCollides(node2->row, node2->col)) ? true : false;
+        } else {
+            int steps_number = static_cast<int>(floor(dist/resolution_));
+            double theta = atan2(node1->col - node2->col, node1->row - node2->row);
+            std::pair<double, double> p_n;
+            for (int n = 1; n < steps_number; n++) {
+            p_n.first = node1->row + n * resolution_ * cos(theta);
+            p_n.second = node1->col + n * resolution_ * sin(theta);
+            if (isThisPointCollides(p_n.first, p_n.second))
+                return true;
+            }
+            return false;
+        }
     }
 
     std::pair<double, double> get_new_point(double goal_bias)
     {
-        //Geerate a pair of random numbers
+        //Generate a pair of random numbers TODO
+        std::random_device rd; // obtain a random number from hardware
+        std::mt19937 gen(rd()); // seed the generator
+        std::uniform_int_distribution<> x(0, 100), y(0, 100); // define the range
+        double point_x = x(gen);
+        double point_y = y(gen); // generate numbers
+        return std::pair<double, double> {pont_x, point_y};
     }
 
     std::pair<double, double> get_new_point_in_ellipsoid(double goal_bias, double c_best)
     {
         if()
         {
-
+            //TODO
         }
 
         else
@@ -77,6 +142,7 @@ class RRT
             double elem2 = sqrt(pow(c_best, 2) - pow(c_min, 2));
             MatrixXd L{{elem1, 0}, {0, elem2}};
             // double r
+            //TODO
             theta = 2 * M_PI * r;
             double x = r * cos(theta);
             double y = r * sin(theta);
@@ -206,6 +272,7 @@ class RRT
 
         return neighbors;        
         //Remove the new node
+        //TODO
 
 
     }
@@ -247,8 +314,6 @@ class RRT
             distance = dis(new_node, *itr);
             distances.push_back(distance);
         }
-
-
     }
 
     void informed_RRT_star(int n_pts, int neigbor_size)
@@ -289,8 +354,3 @@ class RRT
         
     }
 };
-
-int main()
-{
-
-}
