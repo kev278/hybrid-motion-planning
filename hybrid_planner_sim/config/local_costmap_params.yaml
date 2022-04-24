@@ -1,4 +1,5 @@
 local_costmap:
+  map_type: costmap
   global_frame: odom
   robot_base_frame: base_footprint
 
