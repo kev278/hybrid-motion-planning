@@ -8,6 +8,7 @@
 #include <angles/angles.h>
 #include <base_local_planner/world_model.h>
 #include <base_local_planner/costmap_model.h>
+#include "informed_rrt_star.hpp"
 
 using std::string;
 
@@ -30,6 +31,7 @@ namespace hybrid_planner
                       std::vector<geometry_msgs::PoseStamped> &plan);
 
     private:
+        RRT *planner;
         costmap_2d::Costmap2DROS *costmap_ros_;
         double step_size_, min_dist_from_robot_;
         costmap_2d::Costmap2D *costmap_;
