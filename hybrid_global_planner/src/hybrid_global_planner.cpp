@@ -3,6 +3,7 @@
 #include <tf2/convert.h>
 #include <tf2/utils.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+//#include "informed_rrt_star.hpp"
 
 // register this planner as a BaseHybridGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(hybrid_planner::HybridGlobalPlanner, nav_core::BaseGlobalPlanner)
@@ -24,6 +25,7 @@ namespace hybrid_planner
 
     void HybridGlobalPlanner::initialize(std::string name, costmap_2d::Costmap2DROS *costmap_ros)
     {
+        
         if (!initialized_)
         {
             ROS_WARN("Global initialization");
@@ -45,8 +47,17 @@ namespace hybrid_planner
     bool HybridGlobalPlanner::makePlan(const geometry_msgs::PoseStamped &start, const geometry_msgs::PoseStamped &goal, std::vector<geometry_msgs::PoseStamped> &plan)
     {
 
-        plan.push_back(start);
-        plan.push_back(goal);
+        RRT_Node* start_node = new RRT_Node();
+        RRT_Node* goal_node = new RRT_Node();
+        start_node->row = start.pose.position.x;
+        start_node->col = start.pose.position.y;
+        goal_node->row = goal.pose.position.x;
+        goal_node->col = goal.pose.position.y;
+        planner = new RRT(start_node, goal_node, costmap_);
+        
+        
+        
         return true;
+        
     }
 };
