@@ -16,7 +16,7 @@ path - std::vector<geometry_msgs>
 
 using Eigen::MatrixXd;
 
-void costmap_callback(const nav_msgs/OccupancyGrid::ConstPtr& msg)
+void costmap_callback(const nav_msgs::OccupancyGrid::ConstPtr& msg)
 {
     
 }
@@ -32,6 +32,7 @@ struct Node
 
 class RRT
 {
+    
     RRT(Node* start_, Node* goal_, auto costmap_2d::Costmap2D *global_costmap_)
     {
         ros::NodeHandle n;
@@ -43,7 +44,7 @@ class RRT
         start = start_;
         goal = goal_;
     }
-
+    public:
     // Cost Map
     // Working with Cell indexes
     int size_row;
@@ -59,7 +60,7 @@ class RRT
         return sqrt(pow((node1->row - node2->row), 2) + pow((node1->col - node2->col), 2));
     }
 
-    bool CollisionDetector::isThisPointCollides(double wx, double wy) {
+    bool isThisPointCollides(double wx, double wy) {
         // In case of no costmap loaded
         if (global_costmap == nullptr) {
             // no collision
@@ -67,7 +68,7 @@ class RRT
         }
 
         int mx{0}, my{0};
-        worldToMap(wx, wy, mx, my);
+        global_costmap->worldToMap(wx, wy, mx, my);
 
         if ((mx < 0) || (my < 0) || (mx >= global_costmap->getSizeInCellsX()) || (my >= global_costmap->getSizeInCellsY()))
             return true;
@@ -90,7 +91,7 @@ class RRT
         }
 
         double dist = dis(node1, node2);
-        resolution_;
+        auto resolution_ = global_costmap->getResolution;
 
         if (dist < resolution_) {
             return (isThisPointCollides(node2->row, node2->col)) ? true : false;
@@ -160,7 +161,7 @@ class RRT
             double elem1 = c_best / 2;
             double elem2 = sqrt(pow(c_best, 2) - pow(c_min, 2));
             MatrixXd L{{elem1, 0}, {0, elem2}};
-            double r = sqrt(point_ * 100);
+            double r = sqrt(point_x * 100);
             // Check r
             theta = 2 * M_PI * r;
             double x = r * cos(theta);
@@ -335,7 +336,6 @@ class RRT
 
     void informed_RRT_star(int n_pts, int neigbor_size)
     {
-        init_map();
         double c_best{0};
 
         for(int i = 0; i < n_pts; i++)
