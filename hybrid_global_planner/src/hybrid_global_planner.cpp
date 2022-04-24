@@ -35,7 +35,7 @@ namespace hybrid_planner
             private_nh.param("step_size", step_size_, costmap_->getResolution());
             private_nh.param("min_dist_from_robot", min_dist_from_robot_, 0.10);
             world_model_ = new base_local_planner::CostmapModel(*costmap_);
-
+            ROS_INFO("Global Costmap has size x: %d, y: %d", costmap_->getSizeInCellsX(), costmap_->getSizeInCellsY());
             initialized_ = true;
         }
         else
@@ -46,7 +46,6 @@ namespace hybrid_planner
     {
 
         plan.push_back(start);
-        ROS_WARN_STREAM("Start pose is " << start);
         plan.push_back(goal);
         return true;
     }

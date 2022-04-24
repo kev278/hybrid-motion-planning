@@ -22,6 +22,9 @@ void HybridLocalPlanner::initialize(std::string name, tf2_ros::Buffer *tf,
                               costmap_2d::Costmap2DROS *costmap_ros) {
   if (!initialized_) {
     initialized_ = true;
+    costmap_ros_ = costmap_ros;
+    costmap_ = costmap_ros->getCostmap();
+    ROS_INFO("Local Costmap has size x: %d, y: %d", costmap_->getSizeInCellsX(), costmap_->getSizeInCellsY());
   }
 }
 
@@ -33,7 +36,7 @@ bool HybridLocalPlanner::setPlan(
         "before using this planner");
     return false;
   }
-  
+  ROS_WARN_STREAM("Plan is" << orig_global_plan[0]);
   return true;
 }
 

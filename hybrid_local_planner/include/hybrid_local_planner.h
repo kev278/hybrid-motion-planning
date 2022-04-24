@@ -39,6 +39,7 @@ class HybridLocalPlanner : public nav_core::BaseLocalPlanner {
 
  private:
   costmap_2d::Costmap2DROS *costmap_ros_;  ///<@brief pointer to costmap
+  costmap_2d::Costmap2D *costmap_;
   tf2_ros::Buffer *tf_;  ///<@brief pointer to Transform Listener
   bool goal_reached_;
   bool initialized_;
