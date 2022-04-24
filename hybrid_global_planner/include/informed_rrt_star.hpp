@@ -113,17 +113,36 @@ class RRT
         //Generate a pair of random numbers TODO
         std::random_device rd; // obtain a random number from hardware
         std::mt19937 gen(rd()); // seed the generator
-        std::uniform_int_distribution<> x(0, 100), y(0, 100); // define the range
-        double point_x = x(gen);
-        double point_y = y(gen); // generate numbers
-        return std::pair<double, double> {pont_x, point_y};
+        std::uniform_int_distribution<> x0(0, 100); // define the range
+        double point_ = x0(gen);
+        point_ /= 100;
+        
+        if(point_ < goal_bias)
+        {
+            return std::pair<double, double> {goal->row, goal->col};
+        }
+
+        else
+        {
+            std::uniform_int_distribution<> x(0, size_row - 1), y(0, size_col - 1); // define the range
+            double point_x = x(gen);
+            double point_y = y(gen); // generate numbers
+            return std::pair<double, double> {point_x, point_y};
+        }
+
     }
 
     std::pair<double, double> get_new_point_in_ellipsoid(double goal_bias, double c_best)
     {
-        if()
+        std::random_device rd; // obtain a random number from hardware
+        std::mt19937 gen(rd()); // seed the generator
+        std::uniform_int_distribution<> x(0, 100); // define the range
+        double point_x = x(gen);
+        point_x /= 100;
+        
+        if(point_x < goal_bias)
         {
-            //TODO
+            return std::pair<double, double> {goal->row, goal->col};
         }
 
         else
@@ -141,8 +160,8 @@ class RRT
             double elem1 = c_best / 2;
             double elem2 = sqrt(pow(c_best, 2) - pow(c_min, 2));
             MatrixXd L{{elem1, 0}, {0, elem2}};
-            // double r
-            //TODO
+            double r = sqrt(point_ * 100);
+            // Check r
             theta = 2 * M_PI * r;
             double x = r * cos(theta);
             double y = r * sin(theta);
@@ -272,8 +291,6 @@ class RRT
 
         return neighbors;        
         //Remove the new node
-        //TODO
-
 
     }
 
