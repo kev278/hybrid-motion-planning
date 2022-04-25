@@ -43,6 +43,7 @@ void HybridGlobalPlanner::initialize(std::string name,
     ros::NodeHandle private_nh("~/" + name);
     private_nh.param("step_size", step_size_, costmap_->getResolution());
     private_nh.param("min_dist_from_robot", min_dist_from_robot_, 0.10);
+    path_pub = private_nh.advertise<nav_msgs::Path>("chatter", 1000);
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
     ROS_INFO("Global Costmap has size x: %d, y: %d",
              costmap_->getSizeInCellsX(), costmap_->getSizeInCellsY());
@@ -69,10 +70,18 @@ costmap_->worldToMap(goal.pose.position.x, goal.pose.position.y, mx_goal, my_goa
   goal_node->row = mx_goal;
   goal_node->col = my_goal;
   planner = new RRT(start_node, goal_node, costmap_);
-  plan = planner->informed_RRT_star(10000, 20);
+  plan = planner->informed_RRT_star(20000, 40);
+  nav_msgs::Path path;
+  path.poses = plan;
+  path.header = start.header;
+  path.header.frame_id = "map";
+  path_pub.publish(path);
+  ros::spinOnce();
   if (plan.size() == 0){   
+    ROS_INFO("PATH NOT FOUND");
     return false;
   } else {
+    ROS_INFO("PATH FOUND");
     return true;
   }
   }

@@ -270,7 +270,6 @@ class RRT {
 
       if (!found) {
         double d = dis(new_node, goal);
-        ROS_INFO("DIstance is %f", d);
         if (d < extend_dis) {
           goal->cost = d;
           goal->parent = new_node;
@@ -361,7 +360,7 @@ class RRT {
         ROS_WARN("Path found");
         c_best = path_cost(start, goal);
       }
-      std::pair<double, double> new_point = sample(0.1, c_best);
+      std::pair<double, double> new_point = sample(0.2, c_best);
       RRT_Node* new_node = extend(new_point, 0.3);
       // Is not none
       if (new_node != nullptr) {

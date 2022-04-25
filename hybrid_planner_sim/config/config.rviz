@@ -16,6 +16,7 @@ Panels:
         - /DepthCloud1/Auto Size1
         - /Map1
         - /Path1
+        - /Path1/Offset1
         - /Pose1
         - /Map2
       Splitter Ratio: 0.6029411554336548
@@ -169,18 +170,6 @@ Visualization Manager:
           Value: true
         odom:
           Value: true
-        tb3_0/base_footprint:
-          Value: true
-        tb3_0/odom:
-          Value: true
-        tb3_1/base_footprint:
-          Value: true
-        tb3_1/odom:
-          Value: true
-        tb3_2/base_footprint:
-          Value: true
-        tb3_2/odom:
-          Value: true
         wheel_left_link:
           Value: true
         wheel_right_link:
@@ -315,13 +304,13 @@ Visualization Manager:
     - Alpha: 1
       Buffer Length: 1
       Class: rviz/Path
-      Color: 245; 121; 0
+      Color: 252; 175; 62
       Enabled: true
       Head Diameter: 0.30000001192092896
       Head Length: 0.20000000298023224
       Length: 0.30000001192092896
-      Line Style: Lines
-      Line Width: 0.029999999329447746
+      Line Style: Billboards
+      Line Width: 0.5
       Name: Path
       Offset:
         X: 0
@@ -333,7 +322,7 @@ Visualization Manager:
       Radius: 0.029999999329447746
       Shaft Diameter: 0.10000000149011612
       Shaft Length: 0.10000000149011612
-      Topic: /move_base/NavfnROS/plan
+      Topic: /move_base/HybridGlobalPlanner/chatter
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -389,7 +378,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -5.7849955558776855
+      Angle: -5.234999656677246
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
@@ -399,10 +388,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Scale: 247.00274658203125
+      Scale: 243.72189331054688
       Target Frame: <Fixed Frame>
-      X: 4.643028736114502
-      Y: 0.6506087779998779
+      X: -1.580735206604004
+      Y: 4.1049933433532715
     Saved: ~
 Window Geometry:
   Camera:
