@@ -44,7 +44,9 @@ class HybridLocalPlanner : public nav_core::BaseLocalPlanner {
   bool goal_reached_;
   bool initialized_;
   geometry_msgs::PoseStamped current_goal;
+  std::vector<geometry_msgs::PoseStamped> orig_global_plan_;
   geometry_msgs::PoseStamped current_pose;
+  ros::Subscriber odom_sub;
   
 };
 };  // namespace hybrid_planner

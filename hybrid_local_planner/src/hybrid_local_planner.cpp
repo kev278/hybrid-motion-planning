@@ -36,7 +36,7 @@ bool HybridLocalPlanner::setPlan(
         "before using this planner");
     return false;
   }
-  ROS_WARN_STREAM("Plan is" << orig_global_plan[0]);
+  orig_global_plan_ = orig_global_plan;
   return true;
 }
 
@@ -47,8 +47,6 @@ bool HybridLocalPlanner::computeVelocityCommands(geometry_msgs::Twist &cmd_vel) 
         "before using this planner");
     return false;
   }
-  //keep sending positive velocity commands until goal is reached.
-  cmd_vel.linear.x = 0.01;
   return true;
 }
 
