@@ -70,7 +70,7 @@ costmap_->worldToMap(goal.pose.position.x, goal.pose.position.y, mx_goal, my_goa
   goal_node->row = mx_goal;
   goal_node->col = my_goal;
   planner = new RRT(start_node, goal_node, costmap_);
-  plan = planner->informed_RRT_star(20000, 40);
+  plan = planner->informed_RRT_star(10000, 50);
   nav_msgs::Path path;
   path.poses = plan;
   path.header = start.header;

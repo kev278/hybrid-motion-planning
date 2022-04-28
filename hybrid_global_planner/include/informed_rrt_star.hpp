@@ -16,6 +16,22 @@ path - std::vector<geometry_msgs>
 #include <vector>
 
 template <typename T>
+std::vector<size_t> sort_indexes(const std::vector<T>& v) {
+  // initialize original index locations
+  std::vector<size_t> idx(v.size());
+  iota(idx.begin(), idx.end(), 0);
+
+  // sort indexes based on comparing values in v
+  // using std::stable_sort instead of std::sort
+  // to avoid unnecessary index re-orderings
+  // when v contains elements of equal values
+  stable_sort(idx.begin(), idx.end(),
+              [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
+
+  return idx;
+}
+
+template <typename T>
 std::vector<double> linspace(T start_in, T end_in, int num_in) {
   std::vector<double> linspaced;
 
@@ -76,6 +92,7 @@ class RRT {
   RRT_Node* goal;
   std::vector<RRT_Node*> vertices;
   bool found{false};
+  double min_dis = 1000;
   costmap_2d::Costmap2D* global_costmap;
 
   double dis(RRT_Node* node1, RRT_Node* node2) {
@@ -88,8 +105,55 @@ class RRT {
     return sqrt(pow((node1_row_meter - node2_row_meter), 2) +
                 pow((node1_col_meter - node2_col_meter), 2));
   }
+    double dis_grid(RRT_Node* node1, RRT_Node* node2) {
+    return sqrt(pow((node1->row - node2->row), 2) +
+                pow((node1->col - node2->col), 2));
+  }
+bool isThisPointCollides(double mx, double my) {
+  // In case of no costmap loaded
+  if (global_costmap == nullptr) {
+    // no collision
+    return false;
+  }
 
-  // RRT_Node 2 is the new point
+
+  if ((mx < 0) || (my < 0) || (mx >= global_costmap->getSizeInCellsX()) || (my >= global_costmap->getSizeInCellsY())){
+    return true;
+  }
+  // getCost returns unsigned char
+  unsigned int cost = static_cast<int>(global_costmap->getCost(mx, my));
+
+  if (cost > 200){
+    return true;
+  } 
+  return false;
+}
+
+bool check_collision(RRT_Node* node1, RRT_Node *node2) {
+  // In case of no costmap loaded
+  if (global_costmap == nullptr) {
+    // there is NO obstacles
+    return false;
+  }
+
+  float dist = dis_grid(node1, node2);
+  if (dist < 0.05) {
+    return (isThisPointCollides(node2->row, node2->col)) ? true : false;
+  } else {
+    int steps_number = static_cast<int>(floor(dist/0.05));
+    float theta = atan2(node1->col - node2->col, node1->row - node2->row);
+    std::pair<float, float> p_n;
+    for (int n = 1; n < steps_number; n++) {
+      p_n.first = node1->row + n*0.05*cos(theta);
+      p_n.second = node1->col + n*0.05*sin(theta);
+      if (isThisPointCollides(p_n.first, p_n.second)){
+        return false;
+    }
+    }
+    return false;
+  }
+}
+/*   // RRT_Node 2 is the new point
   bool check_collision(RRT_Node* node1, RRT_Node* node2) {
     // convert map to world
     double node1_row_meter, node1_col_meter, node2_row_meter, node2_col_meter;
@@ -98,28 +162,30 @@ class RRT {
     global_costmap->mapToWorld(node2->row, node2->col, node2_row_meter,
                                node2_col_meter);
     std::vector<double> points_between_row =
-        linspace(node1_row_meter, node2_row_meter, 10);
+        linspace(node1_row_meter, node2_row_meter, 50);
     std::vector<double> points_between_col =
-        linspace(node1_col_meter, node2_col_meter, 10);
-
+        linspace(node1_col_meter, node2_col_meter, 50);
+        unsigned int mx;
+        unsigned int my;
     for (int i = 0; i < points_between_row.size(); i++) {
       for (int j = 0; j < points_between_col.size(); j++) {
         // convert world to map and check if point
         double wx = points_between_row[i];
         double wy = points_between_col[j];
-        unsigned int mx;
-        unsigned int my;
         global_costmap->worldToMap(wx, wy, mx, my);
         unsigned char c = global_costmap->getCost(mx, my);
-        int cost = static_cast<int>(c);
+        int cost = c;
 
-        if (cost > 70) {
+        if (cost > 100) {
+          ROS_INFO("COLLISION :(, %lf %lf %lf %lf %lf %lf %d", node1->row, node1->col, node2->row, node2->col, mx, my, cost);
           return true;
+        } else{
+          ROS_WARN("NO COLLISION %lf %lf %lf %lf %d", node1->row, node1->col, node2->row, node2->col, cost);
         }
       }
     }
     return false;
-  }
+  } */
 
   std::pair<double, double> get_new_point(double goal_bias) {
     // Generate a pair of random numbers TODO
@@ -270,7 +336,13 @@ class RRT {
 
       if (!found) {
         double d = dis(new_node, goal);
-        if (d < extend_dis) {
+
+        if (d < min_dis){
+          min_dis = d;
+        }
+                  ROS_INFO("Min distance is %lf", min_dis);
+
+        if (d < 0.2) {
           goal->cost = d;
           goal->parent = new_node;
           vertices.push_back(goal);
@@ -291,8 +363,10 @@ class RRT {
     std::vector<RRT_Node*> neighbors;
     for (const auto& itr : vertices) {
       // ITERATte over vertices and check if less than neighbor size
-      if (dis(new_node, itr) < neighbor_size) {
+      if ((new_node->row != itr->row) || (new_node->col != itr->col)){
+        if (dis(new_node, itr) < neighbor_size) {
         neighbors.push_back(itr);
+      }
       }
     }
     return neighbors;
@@ -306,9 +380,9 @@ class RRT {
     while ((start_node->row != curr_node->row) ||
            (start_node->col != curr_node->col)) {
       RRT_Node* parent = curr_node->parent;
-
       // Not sure about parent is none
       if (parent == nullptr) {
+                ROS_ERROR("Invalid path %lf %lf %lf %lf", curr_node->row, curr_node->col, start_node->row, start_node->col);
         return 0;
       }
 
@@ -319,16 +393,42 @@ class RRT {
     return cost;
   }
 
-  void rewire(RRT_Node* new_node, std::vector<RRT_Node*> neighbors) {
+ void rewire(RRT_Node* new_node, std::vector<RRT_Node*> neighbors) {
     if (neighbors.empty()) {
       return;
     }
 
+    double distance = 0;
     std::vector<double> distances;
-    double distance{0};
-    for (const auto& itr : vertices) {
+    std::vector<double> costs;
+    for (const auto& itr : neighbors) {
       distance = dis(new_node, itr);
       distances.push_back(distance);
+    //  ROS_WARN("First rewire %lf %lf", itr->row, itr->col);
+      costs.push_back(distance + path_cost(start, itr));
+    }
+    std::vector<long unsigned int> indices = sort_indexes(costs);
+    for (int i = 0; i < indices.size(); i++) {
+      long unsigned int index = indices.at(i);
+      if (!check_collision(new_node, neighbors[index])) {
+        new_node->parent = neighbors[index];
+        new_node->cost = distances[index];
+        break;
+      }
+    }
+    double new_cost;
+    for (int i = 0; i < neighbors.size(); i++) {
+      RRT_Node* node = neighbors.at(i);
+     //       ROS_WARN("2 rewire");
+
+      new_cost = path_cost(start, new_node) + distances[i];
+       //     ROS_WARN("3 rewire");
+      if ((path_cost(start, node) > new_cost) &&
+          (!check_collision(node, new_node))) {
+
+        node->parent = new_node;
+        node->cost = distances[i];
+      }
     }
   }
   std::vector<geometry_msgs::PoseStamped> getPath(RRT_Node* start_node, RRT_Node* end_node) {
@@ -352,6 +452,7 @@ class RRT {
     std::reverse(path.begin(), path.end());
     return path;
   }
+
   std::vector<geometry_msgs::PoseStamped> informed_RRT_star(int n_pts, int neigbor_size) {
     double c_best{0};
 
@@ -361,11 +462,10 @@ class RRT {
         c_best = path_cost(start, goal);
       }
       std::pair<double, double> new_point = sample(0.2, c_best);
-      RRT_Node* new_node = extend(new_point, 0.3);
+      RRT_Node* new_node = extend(new_point, 0.2);
       // Is not none
       if (new_node != nullptr) {
 
-        ROS_INFO("I am here");
         std::vector<RRT_Node*> neighbors =
             get_neighbors(new_node, neigbor_size);
         rewire(new_node, neighbors);
@@ -380,7 +480,7 @@ class RRT {
     }
 
     else {
-      ROS_ERROR("No path found");
+      ROS_ERROR("No path found %d", vertices.size());
       return {};
     }
   }

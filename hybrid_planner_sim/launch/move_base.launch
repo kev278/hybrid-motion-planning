@@ -11,8 +11,11 @@
     <rosparam file="$(find hybrid_planner_sim)/config/common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find hybrid_planner_sim)/config/local_costmap_params.yaml" command="load" />
      <param name="base_local_planner" value="hybrid_planner/HybridLocalPlanner" />
-     <param name="base_global_planner" value="hybrid_planner/HybridGlobalPlanner" />
-     <rosparam file="$(find hybrid_planner_sim)/config/global_costmap_params.yaml" command="load" />
+<!--      <param name="base_global_planner" value="rrt_star_global_planner/RRTStarPlanner" />
+ -->
+    <param name="base_global_planner" value="hybrid_planner/HybridGlobalPlanner" />
+ 
+    <rosparam file="$(find hybrid_planner_sim)/config/global_costmap_params.yaml" command="load" />
      <rosparam file="$(find hybrid_planner_sim)/config/common_params.yaml" command="load" ns="global_costmap" />
      <rosparam file="$(find hybrid_planner_sim)/config/hybrid_local_planner_params.yaml" command="load" />
      <rosparam file="$(find hybrid_planner_sim)/config/hybrid_global_planner_params.yaml" command="load" />
