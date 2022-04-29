@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Main and helper function
 
 from mmap import MAP_SHARED
@@ -64,6 +65,8 @@ if __name__ == "__main__":
     # Load the map
     planner = Global_Planner()
 =======
+=======
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 # Main and helper function
 
 from PIL import Image
@@ -98,4 +101,7 @@ if __name__ == "__main__":
     # RRT_planner.RRT(n_pts=1000)
     # RRT_planner.RRT_star(n_pts=2000)
     RRT_planner.informed_RRT_star(n_pts=2000)
+<<<<<<< HEAD
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
+=======
 >>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
