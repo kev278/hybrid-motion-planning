@@ -4,7 +4,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import spatial
+<<<<<<< HEAD
 
+=======
+import math
+from random import random, randrange
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
 # Class for each tree node
 class Node:
@@ -42,7 +47,10 @@ class RRT:
         arguments:
             node1 - node 1
             node2 - node 2
+<<<<<<< HEAD
             
+=======
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
         return:
             euclidean distance between two nodes
@@ -87,6 +95,7 @@ class RRT:
             point = [np.random.randint(0, self.size_row-1), np.random.randint(0, self.size_col-1)]
         return point
 
+<<<<<<< HEAD
     def RotationToWorldFrame(self, start, goal):
         '''Used the original Informed RRT* paper as reference 
         to write this function 
@@ -111,6 +120,9 @@ class RRT:
             x, y = np.random.uniform(-1, 1), np.random.uniform(-1, 1)
             if x ** 2 + y ** 2 < 1:
                 return np.array([[x], [y], [0.0]])  
+=======
+    
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
     def get_new_point_in_ellipsoid(self, goal_bias, c_best):
         '''Choose the goal or generate a random point in an ellipsoid
            defined by start, goal and current best length of path
@@ -124,6 +136,7 @@ class RRT:
         # Select goal
         if np.random.random() < goal_bias:
             point = [self.goal.row, self.goal.col]
+<<<<<<< HEAD
         
         #### TODO ####
         # Generate a random point in an ellipsoid
@@ -160,6 +173,39 @@ class RRT:
             point = [xrand[0][0], xrand[1][0]]
 
         #### TODO END ####
+=======
+    
+        else:
+            # Compute the distance between start and goal - c_min
+            c_min = self.dis(self.start, self.goal)
+            
+            # Calculate center of the ellipsoid - x_center
+            x_center = [(self.start.row + self.goal.row)/2, (self.start.col + self.goal.col)/2]
+            
+            # Compute rotation matrix from ellipse to world frame - C
+            theta = math.atan2((self.goal.col-self.start.col),(self.goal.row-self.start.row))
+            C = [[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]]
+            
+            # Compute diagonal matrix - L
+            arr = [c_best/2, np.sqrt(c_best**2-c_min**2)/2]
+            L = np.diag(arr)
+            
+            # Cast a sample from a unit ball - x_ball
+            u = random()
+            v = random()
+            r = np.sqrt(u)
+
+            theta = 2* np.pi * v
+            
+            x = r*np.cos(theta)
+            y = r*np.sin(theta)
+
+            x_ball = [x, y]
+            # Map ball sample to the ellipsoid - x_rand
+            x_rand = np.dot(np.dot(C, L), x_ball) + x_center
+            point = [x_rand[0], x_rand[1]]
+
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
         return point
 
     
@@ -189,6 +235,7 @@ class RRT:
 
         Generate a new point
         '''
+<<<<<<< HEAD
         # Generate a new point
 
         #### TODO ####
@@ -203,6 +250,20 @@ class RRT:
         else:
             new_point = self.get_new_point_in_ellipsoid(goal_bias, c_best) 
         #### TODO END ####
+=======
+        new_point = self.get_new_point(goal_bias) #del this
+
+        # Regular sampling if c_best <= 0
+        # using self.get_new_point
+        if c_best <= 0:
+            new_point = self.get_new_point(goal_bias)
+        # Sampling in an ellipsoid if c_best is a positive value
+        # using self.get_new_point_in_ellipsoid
+        else:   
+            new_point = self.get_new_point_in_ellipsoid(goal_bias, c_best)
+        #### TODO END ####
+
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
         return new_point
 
 
@@ -279,9 +340,13 @@ class RRT:
         '''
         cost = 0
         curr_node = end_node
+<<<<<<< HEAD
         while start_node.row != curr_node.row or start_node.col != curr_node.col:
             # Keep tracing back until finding the start_node 
             # or no path exists
+=======
+        while start_node.row != curr_node.row or start_node.col != curr_node.col:# Keep tracing back until finding the start_node or no path exists
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
             parent = curr_node.parent
             if parent is None:
                 print("Invalid Path")
@@ -311,8 +376,12 @@ class RRT:
         # Rewire the new node
         # compute the least potential cost
         costs = [d + self.path_cost(self.start, neighbors[i]) for i, d in enumerate(distances)]
+<<<<<<< HEAD
         indices = np.argsort(np.array(costs))
         # check collision and connect the best node to the new node
+=======
+        indices = np.argsort(np.array(costs)) #Collision Check
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
         for i in indices:
             if not self.check_collision(new_node, neighbors[i]):
                 new_node.parent = neighbors[i]
@@ -323,14 +392,19 @@ class RRT:
         for i, node in enumerate(neighbors):
             # new cost
             new_cost = self.path_cost(self.start, new_node) + distances[i]
+<<<<<<< HEAD
             # if new cost is lower
             # and there is no obstacles in between
             if self.path_cost(self.start, node) > new_cost and \
                not self.check_collision(node, new_node):
+=======
+            if self.path_cost(self.start, node) > new_cost and not self.check_collision(node, new_node): #low cost and no obstactle condition
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
                 node.parent = new_node
                 node.cost = distances[i]
 
     
+<<<<<<< HEAD
     def get_path(self):
         '''Visualization of the result
         '''
@@ -365,6 +439,35 @@ class RRT:
         path.reverse()
         print("done printing")
         return path
+=======
+    def draw_map(self):
+        '''Visualization of the result
+        '''
+        # Create empty map
+        fig, ax = plt.subplots(1)
+        img = 255 * np.dstack((self.map_array, self.map_array, self.map_array))
+        ax.imshow(img)
+
+        # Draw Trees or Sample points
+        for node in self.vertices[1:-1]:
+            plt.plot(node.col, node.row, markersize=3, marker='o', color='y')
+            plt.plot([node.col, node.parent.col], [node.row, node.parent.row], color='y')
+        
+        # Draw Final Path if found
+        if self.found:
+            cur = self.goal
+            while cur.col != self.start.col or cur.row != self.start.row:
+                plt.plot([cur.col, cur.parent.col], [cur.row, cur.parent.row], color='b')
+                cur = cur.parent
+                plt.plot(cur.col, cur.row, markersize=3, marker='o', color='b')
+
+        # Draw start and goal
+        plt.plot(self.start.col, self.start.row, markersize=5, marker='o', color='g')
+        plt.plot(self.goal.col, self.goal.row, markersize=5, marker='o', color='r')
+
+        # show image
+        plt.show()
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
 
     def RRT(self, n_pts=1000):
@@ -382,7 +485,11 @@ class RRT:
             # Extend a new node until all the points are sampled
             # or find the path
             new_point = self.sample(0.05, 0)
+<<<<<<< HEAD
             new_node = self.extend(new_point, 2)
+=======
+            new_node = self.extend(new_point, 10)
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
             if self.found:
                 break
 
@@ -396,7 +503,11 @@ class RRT:
             print("No path found")
         
         # Draw result
+<<<<<<< HEAD
         return self.get_path()
+=======
+        self.draw_map()
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
 
     def RRT_star(self, n_pts=1000, neighbor_size=20):
@@ -414,7 +525,11 @@ class RRT:
         for i in range(n_pts):
             # Extend a new node
             new_point = self.sample(0.05, 0)
+<<<<<<< HEAD
             new_node = self.extend(new_point, 2)
+=======
+            new_node = self.extend(new_point, 10)
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
             # Rewire
             if new_node is not None:
                 neighbors = self.get_neighbors(new_node, neighbor_size)
@@ -430,7 +545,11 @@ class RRT:
             print("No path found")
 
         # Draw result
+<<<<<<< HEAD
         return self.get_path()
+=======
+        self.draw_map()
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
 
     def informed_RRT_star(self, n_pts=1000, neighbor_size=20):
@@ -445,6 +564,7 @@ class RRT:
         '''
         # Remove previous result
         self.init_map()
+<<<<<<< HEAD
         # Start searching       
         for i in range(n_pts):
 
@@ -460,10 +580,25 @@ class RRT:
             # Extend a new node
             new_point = self.sample(0.05, c_best)
             new_node = self.extend(new_point, 2)
+=======
+        # Start searching  
+        c_best = 0     
+        for i in range(n_pts):
+            # Extend a new node
+            new_point = self.sample(0.05, c_best)
+            new_node = self.extend(new_point, 10)
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
             # Rewire
             if new_node is not None:
                 neighbors = self.get_neighbors(new_node, neighbor_size)
                 self.rewire(new_node, neighbors)
+<<<<<<< HEAD
+=======
+                if self.found:
+                    c_best = self.path_cost(self.start, self.goal)
+
+            
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
 
         # Output
         if self.found:
@@ -475,4 +610,8 @@ class RRT:
             print("No path found")
 
         # Draw result
+<<<<<<< HEAD
         return self.get_path()
+=======
+        self.draw_map()
+>>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
