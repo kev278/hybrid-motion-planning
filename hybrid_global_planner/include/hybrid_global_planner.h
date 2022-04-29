@@ -37,6 +37,7 @@ namespace hybrid_planner
         double step_size_, min_dist_from_robot_;
         costmap_2d::Costmap2D *costmap_;
         ros::Publisher path_pub;
+        ros::ServiceClient rrt_client;
         base_local_planner::WorldModel *world_model_; ///< @brief The world model that the controller will use
         bool initialized_;
     };

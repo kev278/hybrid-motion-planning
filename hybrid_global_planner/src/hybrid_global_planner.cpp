@@ -4,6 +4,7 @@
 #include <tf2/convert.h>
 #include <tf2/utils.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include "nav_msgs/GetPlan.h"
 //#include "informed_rrt_star.hpp"
 
 // register this planner as a BaseHybridGlobalPlanner plugin
@@ -41,9 +42,12 @@ void HybridGlobalPlanner::initialize(std::string name,
 
     // initialize other planner parameters
     ros::NodeHandle private_nh("~/" + name);
+
     private_nh.param("step_size", step_size_, costmap_->getResolution());
     private_nh.param("min_dist_from_robot", min_dist_from_robot_, 0.10);
     path_pub = private_nh.advertise<nav_msgs::Path>("chatter", 1000);
+    ros::NodeHandle n;
+    rrt_client = n.serviceClient<nav_msgs::GetPlan>("rrt_get_plan");
     world_model_ = new base_local_planner::CostmapModel(*costmap_);
     ROS_INFO("Global Costmap has size x: %d, y: %d",
              costmap_->getSizeInCellsX(), costmap_->getSizeInCellsY());
@@ -57,32 +61,42 @@ bool HybridGlobalPlanner::makePlan(
     const geometry_msgs::PoseStamped &start,
     const geometry_msgs::PoseStamped &goal,
     std::vector<geometry_msgs::PoseStamped> &plan) {
-  RRT_Node *start_node = new RRT_Node();
-  RRT_Node *goal_node = new RRT_Node();
   unsigned int mx_start, my_start, mx_goal, my_goal;
   costmap_->worldToMap(start.pose.position.x, start.pose.position.y, mx_start, my_start);
-
-  start_node->row = mx_start;
-  start_node->col = my_start;
-
-costmap_->worldToMap(goal.pose.position.x, goal.pose.position.y, mx_goal, my_goal);
-
-  goal_node->row = mx_goal;
-  goal_node->col = my_goal;
-  planner = new RRT(start_node, goal_node, costmap_);
-  plan = planner->informed_RRT_star(10000, 50);
-  nav_msgs::Path path;
-  path.poses = plan;
+  costmap_->worldToMap(goal.pose.position.x, goal.pose.position.y, mx_goal, my_goal);
+  nav_msgs::GetPlan srv;
+  srv.request.start.pose.position.x = mx_start;
+  srv.request.start.pose.position.y = my_start;
+  
+  srv.request.goal.pose.position.x = mx_goal;
+  srv.request.goal.pose.position.y = my_goal;
+  if (rrt_client.call(srv))
+  {
+    ROS_INFO("Got path");
+  }
+  else
+  {
+    ROS_ERROR("Failed to call service rrt_planner");
+    return 1;
+  }
+  nav_msgs::Path path = srv.response.plan;
+  
   path.header = start.header;
   path.header.frame_id = "map";
+  unsigned int mx, my;
+  double wx, wy;
+  ROS_INFO("PATH POSES ARE %lf", path.poses.size());
+  for (int i = 0; i < path.poses.size(); i++){
+    mx = path.poses[i].pose.position.x;
+    my = path.poses[i].pose.position.y;
+    path.poses[i].pose.orientation.w = 1;
+    costmap_->mapToWorld(mx, my, wx, wy);
+    path.poses[i].pose.position.x = wx;
+    path.poses[i].pose.position.y = wy;
+    ROS_INFO("HERE %lf %lf %lf %lf", mx, my ,wx, wy);
+  }
+  ROS_INFO_STREAM("PATH is done, publishing" << path);
   path_pub.publish(path);
   ros::spinOnce();
-  if (plan.size() == 0){   
-    ROS_INFO("PATH NOT FOUND");
-    return false;
-  } else {
-    ROS_INFO("PATH FOUND");
-    return true;
-  }
   }
 };
