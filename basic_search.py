@@ -2,7 +2,10 @@
 # Basic searching algorithms
 import numpy as np
 from operator import attrgetter
-# Class for each node in the grid
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+from matplotlib.patches import Rectangle# Class for each node in the grid
 class Node:
     def __init__(self, row, col, is_obs, h):
         self.row = row        # coordinate
@@ -13,6 +16,29 @@ class Node:
         self.cost = None      # total cost (depend on the algorithm)
         self.parent = None    # previous node
         self.color = 0
+        
+def draw_path(grid, path, goal, start, title="BFS"):
+    '''Visualization of the result
+    '''
+    # Create empty map
+    np.where(grid == 1, 1, 0)
+    fig, ax = plt.subplots(1)
+    img = 255 * np.dstack((grid, grid, grid))
+    ax.imshow(img)
+    # Draw Final Path if found
+    cur = goal
+    while cur.col != start.col and cur.row != start.row:
+        plt.plot([cur.col, cur.parent.col], [cur.row, cur.parent.row], color='b')
+        cur = cur.parent
+        plt.plot(cur.col, cur.row, markersize=3, marker='o', color='b')
+
+        # Draw start and goal
+    plt.plot(start.col, start.row, markersize=5, marker='o', color='g')
+    plt.plot(goal.col, goal.row, markersize=5, marker='o', color='r')
+
+    # show image
+    plt.show()
+
 #reconstruct path given the goal node
 def reconstructPath(node):
     path= []
@@ -81,7 +107,7 @@ def findPath(start, goal, grid, useH, is_bfs):
         if checkGoal(current, goal_node):
             #print("goal found steps are", steps)
             path = reconstructPath(current)
-            return path, True, steps
+            return path, True, steps, node_grid
         openSet.remove(current)
         adj_nodes = getAdjacentNodes(node_grid, current)
         for neighbor in adj_nodes:
@@ -103,8 +129,8 @@ def findPath(start, goal, grid, useH, is_bfs):
                         openSet.append(neighbor)
             current.color = 2
     #print("here :(")               
-    return [], False, steps
-def bfs(grid, start, goal):
+    return [], False, steps, node_grid
+def bfs(grid, start, goal, plot_on):
     '''Return a path found by BFS alogirhm 
        and the number of steps it takes to find it.
 
@@ -131,12 +157,16 @@ def bfs(grid, start, goal):
     path = []
     steps = 0
     found = False
-    path, found, steps = findPath(start, goal, grid, 0, 1)
+    path, found, steps, node_grid = findPath(start, goal, grid, 0, 1)
     if found:
         print(f"It takes {steps} steps to find a path using BFS")
     else:
         print("No path found")
-    return path, steps
+    if (plot_on == "1"):
+        draw_path(grid, path, node_grid[goal[0], goal[1]], node_grid[start[0], start[1]], title="BFS")
+    return path  
+
+
 
 #dfs visit function
 def dfs_visit(node_grid, u, time, steps, found, goal):
@@ -159,7 +189,7 @@ def dfs_visit(node_grid, u, time, steps, found, goal):
     return found
     
 #running this as a recursive algorithm.
-def dfs(grid, start, goal):
+def dfs(grid, start, goal, plot_on):
     '''Return a path found by DFS alogirhm 
        and the number of steps it takes to find it.
 
@@ -199,7 +229,7 @@ def dfs(grid, start, goal):
     return path
 
 
-def dijkstra(grid, start, goal):
+def dijkstra(grid, start, goal, plot_on):
     '''Return a path found by Dijkstra alogirhm 
        and the number of steps it takes to find it.
 
@@ -226,15 +256,18 @@ def dijkstra(grid, start, goal):
     path = []
     steps = 0
     found = False
-    path, found, steps = findPath(start, goal, grid, 0, 0)
+    path, found, steps, node_grid = findPath(start, goal, grid, 0, 0)
     if found:
         print(f"It takes {steps} steps to find a path using Dijkstra")
     else:
         print("No path found")
+    if (plot_on == "1"):
+        draw_path(grid, path, node_grid[goal[0], goal[1]], node_grid[start[0], start[1]], title="")
+
     return path
 
 
-def astar(grid, start, goal):
+def astar(grid, start, goal, plot_on):
     '''Return a path found by A* alogirhm 
        and the number of steps it takes to find it.
 
@@ -261,11 +294,14 @@ def astar(grid, start, goal):
     path = []
     steps = 0
     found = False
-    path, found, steps = findPath(start, goal, grid, 1, 0)
+    path, found, steps, node_grid = findPath(start, goal, grid, 1, 0)
     if found:
         print(f"It takes {steps} steps to find a path using A*")
     else:
         print("No path found")
+    if (plot_on == "1"):
+        draw_path(grid, path, node_grid[goal[0], goal[1]], node_grid[start[0], start[1]], title="BFS")
+
     return path
 
 

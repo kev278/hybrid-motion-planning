@@ -62,6 +62,8 @@ bool HybridGlobalPlanner::makePlan(
     const geometry_msgs::PoseStamped &goal,
     std::vector<geometry_msgs::PoseStamped> &plan) {
   unsigned int mx_start, my_start, mx_goal, my_goal;
+  //get the new version of the costmap
+  costmap_ = costmap_ros_->getCostmap();  // get the costmap_ from costmap_ros_
   costmap_->worldToMap(start.pose.position.x, start.pose.position.y, mx_start, my_start);
   costmap_->worldToMap(goal.pose.position.x, goal.pose.position.y, mx_goal, my_goal);
   nav_msgs::GetPlan srv;
@@ -80,23 +82,30 @@ bool HybridGlobalPlanner::makePlan(
     return 1;
   }
   nav_msgs::Path path = srv.response.plan;
-  
   path.header = start.header;
   path.header.frame_id = "map";
+  plan = srv.response.plan.poses;
   unsigned int mx, my;
   double wx, wy;
-  ROS_INFO("PATH POSES ARE %lf", path.poses.size());
   for (int i = 0; i < path.poses.size(); i++){
     mx = path.poses[i].pose.position.x;
     my = path.poses[i].pose.position.y;
     path.poses[i].pose.orientation.w = 1;
     costmap_->mapToWorld(mx, my, wx, wy);
     path.poses[i].pose.position.x = wx;
+    plan[i].pose.position.x = wx;
+    plan[i].pose.position.y = wy;
+    plan[i].header = start.header;
+    plan[i].header.frame_id = "map";
     path.poses[i].pose.position.y = wy;
-    ROS_INFO("HERE %lf %lf %lf %lf", mx, my ,wx, wy);
   }
-  ROS_INFO_STREAM("PATH is done, publishing" << path);
+  ROS_INFO("publishing path");
   path_pub.publish(path);
   ros::spinOnce();
+  if (path.poses.size() > 0){
+    ROS_INFO("PLANNING SUCCESSFUL");
+    return true;
+  } 
+  return false;
   }
 };

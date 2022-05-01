@@ -1,8 +1,7 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 # Main and helper function
 
 from mmap import MAP_SHARED
+from tkinter import N
 from PIL import Image
 import numpy as np
 from RRT import RRT
@@ -13,95 +12,113 @@ from nav_msgs.msg import Path
 from nav_msgs.msg import OccupancyGrid
 from geometry_msgs.msg import PoseStamped
 import rospy
-from astar import astar
+from basic_search import bfs, dfs, dijkstra, astar
+import sys
+
 class Global_Planner:
         
     def rrt_srv_callback(self, req):
-        print("Starting RRT Planning. Start: ", req.start.pose.position.x, " ", req.start.pose.position.y, " Goal: ", req.goal.pose.position.x, " ", req.goal.pose.position.y)
+        print("Starting Planning. Start: ", req.start.pose.position.x, " ", req.start.pose.position.y, " Goal: ", req.goal.pose.position.x, " ", req.goal.pose.position.y)
         start = (int(req.start.pose.position.x), int(req.start.pose.position.y))
         goal  = (int(req.goal.pose.position.x), int(req.goal.pose.position.y))
-        RRT_planner = RRT(self.map_array, start, goal)
-        plan_ = RRT_planner.informed_RRT_star(n_pts=10000)
+        #chose algorithm based on command line output
+        if self.algo == 'astar':
+            print('launching ASTAR ')
+            plan_ = astar(self.map_array, start, goal, self.plot_on)
+        elif self.algo == 'informed_rrt':
+            print('launching informed rrt star ')
+            RRT_planner = RRT(self.map_array, start, goal, self.plot_on)
+            plan_ = RRT_planner.informed_RRT_star(n_pts=2000)
+        elif self.algo == 'rrt':
+            print('launching rrt ')
+            RRT_planner = RRT(self.map_array, start, goal, self.plot_on)
+            plan_ = RRT_planner.RRT(n_pts=5000)
+        elif self.algo == 'rrt_star':
+            print('launching rrt_star ')
+            RRT_planner = RRT(self.map_array, start, goal, self.plot_on)
+            plan_ = RRT_planner.RRT_star(n_pts=5000)
+        elif self.algo == 'dijkstra':
+            print('launching dijkstra ')
+            plan_ = dijkstra(self.map_array, start, goal, self.plot_on)
+        elif self.algo == 'bfs':
+            print('launching bfs ')
+            plan_ = bfs(self.map_array, start, goal, self.plot_on)
+        elif self.algo == 'dfs':
+            print('launching dfs')
+            plan_ = dfs(self.map_array, start, goal, self.plot_on)
+        else:
+            print("Invalid usage! example usage: python main.py <algorithm>")
+            print("choices of algorithms: astar, informed_rrt, rrt, rrt_star, dijkstra, bfs, dfs")
+
         #plan_ = astar(self.map_array, start, goal)
         plan = Path()
-        for node in plan_:
-            node_pose = PoseStamped()
-            node_pose.pose.position.x = node[0]
-            node_pose.pose.position.y = node[1]
-            print("Node is ", node[1], " ", node[1])
-            plan.poses.append(node_pose)
-        print("path length is ", len(plan_))
+        if (self.algo == 'informed_rrt' or self.algo=='rrt' or self.algo == 'rrt_star'):
+            for node in plan_:
+                node_pose = PoseStamped()
+                node_pose.pose.position.x = node[0]
+                node_pose.pose.position.y = node[1]
+                plan.poses.append(node_pose)
+            print("path length is ", len(plan_))
+        else:
+            for node in plan_:
+                node_pose = PoseStamped()
+                node_pose.pose.position.x = node[0]
+                node_pose.pose.position.y = node[1]
+                plan.poses.append(node_pose)
+            print("path length is ", len(plan_))
         return GetPlanResponse(plan)
 
     def costmap_sub_callback(self, data):
         #test
         print("Costmap recieved. Processing, please wait!")
-        self.map_array = np.array(data.data,
+        map_array_ = np.array(data.data,
                                    dtype=np.int8).reshape(data.info.height,
                                                           data.info.width)
-        for i in range(1,len(self.map_array[0])):
-            for j in range(1, len(self.map_array[1])):
-                point = self.map_array[i, j]
-                if point > 2:
-                    #if cost > 10 then assume it is obstacle
-                    self.map_array[i, j] = 0
-                elif point < 0:
-                    self.map_array[i, j] = 0
-                else:
-                    self.map_array[i, j] = 1
+        self.map_array = np.zeros((data.info.height, data.info.height))
 
-        print("done processing, ready to plan")
+        if (self.algo == 'informed_rrt' or self.algo=='rrt' or self.algo == 'rrt_star'):
+            for i in range(1,len(map_array_[1])):
+                for j in range(1, len(map_array_[0])):
+                    point = map_array_[i, j]
+                    if point > 0:
+                        #if cost > 10 then assume it is obstacle
+                        self.map_array[j, i] = 0
+                    elif point < 0:
+                        self.map_array[j, i] = 0
+                    else:
+                        self.map_array[j, i] = 1
+        else:
+            for i in range(1,len(map_array_[1])):
+                for j in range(1, len(map_array_[0])):
+                    point = map_array_[i, j]
+                    if point > 0:
+                        #if cost > 10 then assume it is obstacle
+                        self.map_array[j, i] = 1
+                    elif point < 0:
+                        self.map_array[j, i] = 1
+                    else:
+                        self.map_array[j, i] = 0
+        print("done processing, ready to plan ", self.algo)
         
 
-    def __init__(self):
+    def __init__(self, algo, plot_on):
         rospy.init_node('rrt_planner')
+        self.algo = algo
+        self.plot_on = plot_on
         rospy.Subscriber("/map", OccupancyGrid, self.costmap_sub_callback)
         s = rospy.Service('rrt_get_plan', GetPlan, self.rrt_srv_callback)
-        print("Ready to plan RRT")
+        print("Ready to plan")
         self.map_array = []
         rospy.spin()
 
 if __name__ == "__main__":
     # Load the map
-    planner = Global_Planner()
-=======
-=======
->>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
-# Main and helper function
-
-from PIL import Image
-import numpy as np
-from RRT import RRT
-
-import matplotlib.pyplot as plt
-from nav_msgs.srv import GetPlan
-import rospy
-
-
-        
-def handle_add_two_ints(self,req):
-    print("Returning [%s + %s = %s]"%(req.a, req.b, (req.a + req.b)))
-    return AddTwoIntsResponse(req.a + req.b)
-
-def add_two_ints_server(self):
-    rospy.init_node('add_two_ints_server')
-    s = rospy.Service('add_two_ints', AddTwoInts, handle_add_two_ints)
-    print("Ready to add two ints.")
-    rospy.spin()
-if __name__ == "__main__":
-    # Load the map
-    start = (200, 75)
-    goal  = (30, 250)
-    # map_array = load_map("WPI_map.jpg", 0.3)
-
-    # Planning class
-    RRT_planner = RRT(map_array, start, goal)
-
-    # Search with RRT and RRT*
-    # RRT_planner.RRT(n_pts=1000)
-    # RRT_planner.RRT_star(n_pts=2000)
-    RRT_planner.informed_RRT_star(n_pts=2000)
-<<<<<<< HEAD
->>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
-=======
->>>>>>> 4b55fe67972983161b60dc4ad881b7d8afefdbb2
+    if (len(sys.argv) !=2 and len(sys.argv) !=3):
+        print(" ",sys.argv, " ", len(sys.argv))
+        print("Invalid usage! example usage: python main.py <algorithm> <plot_on:= 1/0>")
+        print("choices of algorithms: astar, informed_rrt, rrt, rrt_star, dijkstra, bfs, dfs")
+    else:
+        if (len(sys.argv) == 2):
+            planner = Global_Planner(sys.argv[1], 0)
+        else:
+            planner =  Global_Planner(sys.argv[1], sys.argv[2])

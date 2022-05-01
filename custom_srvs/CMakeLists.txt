@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(hybrid_planner_sim)
+project(custom_srvs)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
   rospy
-  custom_srvs
   turtlebot3_gazebo
   message_generation
 )
@@ -58,7 +57,6 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate services in the 'srv' folder
 
-
 ## Generate actions in the 'action' folder
 # add_action_files(
 #   FILES
@@ -101,12 +99,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES hybrid_planner_sim
-#  CATKIN_DEPENDS roscpp rospy turtlebot3 turtlebot3_gazebo
-#  DEPENDS system_lib
-)
+
 
 ###########
 ## Build ##
@@ -127,12 +120,12 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-
+# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(move_node src/move_node.cpp)
+
 
 
 ## Rename C++ executable without prefix
@@ -163,7 +156,7 @@ add_executable(move_node src/move_node.cpp)
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-target_link_libraries(move_node ${catkin_LIBRARIES})
+
 
 
 ## Mark executables for installation
@@ -171,6 +164,17 @@ target_link_libraries(move_node ${catkin_LIBRARIES})
 # install(TARGETS ${PROJECT_NAME}_node
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
+ add_service_files(DIRECTORY srv FILES
+   VelCmd.srv
+ )
+ 
+generate_messages(DEPENDENCIES
+  nav_msgs
+)
+
+catkin_package(CATKIN_DEPENDS 
+  message_runtime
+  nav_msgs)
 
 ## Mark libraries for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_libraries.html

@@ -22,6 +22,10 @@ void HybridLocalPlanner::initialize(std::string name, tf2_ros::Buffer *tf,
                               costmap_2d::Costmap2DROS *costmap_ros) {
   if (!initialized_) {
     initialized_ = true;
+    char **argc;
+    int argv;
+    ros::NodeHandle n;
+    ros::ServiceClient client = n.serviceClient<custom_srvs::VelCmd>("move_robot");
     costmap_ros_ = costmap_ros;
     costmap_ = costmap_ros->getCostmap();
     ROS_INFO("Local Costmap has size x: %d, y: %d", costmap_->getSizeInCellsX(), costmap_->getSizeInCellsY());
@@ -36,6 +40,12 @@ bool HybridLocalPlanner::setPlan(
         "before using this planner");
     return false;
   }
+  ROS_INFO("SET PLAN");
+  nav_msgs::Path path;
+  path.poses = orig_global_plan;
+  custom_srvs::VelCmd srv;
+  srv.request.path = path;
+  client.call(srv);
   orig_global_plan_ = orig_global_plan;
   return true;
 }
@@ -47,6 +57,7 @@ bool HybridLocalPlanner::computeVelocityCommands(geometry_msgs::Twist &cmd_vel) 
         "before using this planner");
     return false;
   }
+  ROS_INFO("LOCAL PLANNER ");
   return true;
 }
 

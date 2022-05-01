@@ -3,7 +3,7 @@
   <arg name="x_pos" default="0"/>
   <arg name="y_pos" default="0"/>
   <arg name="z_pos" default="0.0"/>
-  <arg name="map_file" default="$(find hybrid_planner_sim)/config/rooms.yaml"/>
+  <arg name="map_file" default="$(find hybrid_planner_sim)/config/Maze.yaml"/>
  
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find turtlebot3_gazebo)/worlds/turtlebot3_stage_4.world"/>
@@ -14,7 +14,7 @@
     <arg name="debug" value="false"/>
   </include>
 
-
+   <node name="move_node" pkg="hybrid_planner_sim" type="move_node"  output="screen"/>
    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" />
     <arg name="frame_id" value="odom"/>
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(find turtlebot3_description)/urdf/turtlebot3_$(arg model).urdf.xacro" />

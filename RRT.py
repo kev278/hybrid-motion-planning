@@ -4,7 +4,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy import spatial
-
+import matplotlib
+matplotlib.use('TkAgg')
 
 # Class for each tree node
 class Node:
@@ -18,11 +19,11 @@ class Node:
 # Class for RRT
 class RRT:
     # Constructor
-    def __init__(self, map_array, start, goal):
+    def __init__(self, map_array, start, goal, plot_on):
         self.map_array = map_array            # map array, 1->free, 0->obstacle
         self.size_row = map_array.shape[0]    # map size
         self.size_col = map_array.shape[1]    # map size
-
+        self.plot_on = plot_on
         self.start = Node(start[0], start[1]) # start node
         self.goal = Node(goal[0], goal[1])    # goal node
         self.vertices = []                    # list of nodes
@@ -366,6 +367,33 @@ class RRT:
         print("done printing")
         return path
 
+    def draw_map(self):
+        '''Visualization of the result
+        '''
+        # Create empty map
+        fig, ax = plt.subplots(1)
+        img = 255 * np.dstack((self.map_array, self.map_array, self.map_array))
+        ax.imshow(img)
+
+        # Draw Trees or Sample points
+        for node in self.vertices[1:-1]:
+            plt.plot(node.col, node.row, markersize=3, marker='o', color='y')
+            plt.plot([node.col, node.parent.col], [node.row, node.parent.row], color='y')
+        
+        # Draw Final Path if found
+        if self.found:
+            cur = self.goal
+            while cur.col != self.start.col and cur.row != self.start.row:
+                plt.plot([cur.col, cur.parent.col], [cur.row, cur.parent.row], color='b')
+                cur = cur.parent
+                plt.plot(cur.col, cur.row, markersize=3, marker='o', color='b')
+
+        # Draw start and goal
+        plt.plot(self.start.col, self.start.row, markersize=5, marker='o', color='g')
+        plt.plot(self.goal.col, self.goal.row, markersize=5, marker='o', color='r')
+
+        # show image
+        plt.show()
 
     def RRT(self, n_pts=1000):
         '''RRT main search function
@@ -396,6 +424,8 @@ class RRT:
             print("No path found")
         
         # Draw result
+        if self.plot_on == "1":
+            self.draw_map()
         return self.get_path()
 
 
@@ -430,6 +460,9 @@ class RRT:
             print("No path found")
 
         # Draw result
+       # Draw result
+        if self.plot_on == "1":
+            self.draw_map()
         return self.get_path()
 
 
@@ -451,6 +484,7 @@ class RRT:
             #### TODO ####
             c_best = 0
             if self.found:
+                print("path found")
                 c_best_old = c_best
                 c_best = self.path_cost(self.start, self.goal)
             # Once a path is found, update the best length of path - c_best
@@ -464,6 +498,8 @@ class RRT:
             if new_node is not None:
                 neighbors = self.get_neighbors(new_node, neighbor_size)
                 self.rewire(new_node, neighbors)
+                print("here in rewire")
+            print(i)
 
         # Output
         if self.found:
@@ -475,4 +511,7 @@ class RRT:
             print("No path found")
 
         # Draw result
+       # Draw result
+        if self.plot_on == "1":
+            self.draw_map()
         return self.get_path()

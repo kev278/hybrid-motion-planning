@@ -94,7 +94,9 @@
   <build_export_depend>tf2_ros</build_export_depend>
 
 
-
+  <exec_depend>custom_srvs</exec_depend>
+  <build_depend>custom_srvs</build_depend>
+  <build_export_depend>custom_srvs</build_export_depend>
 
 
   <export>

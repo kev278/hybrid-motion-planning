@@ -3,6 +3,8 @@
 
 #ifndef HYBRID_LOCAL_PLANNER_H
 #define HYBRID_LOCAL_PLANNER_H
+#include <custom_srvs/VelCmd.h>
+
 #include <angles/angles.h>
 #include <base_local_planner/costmap_model.h>
 #include <base_local_planner/world_model.h>
@@ -43,6 +45,10 @@ class HybridLocalPlanner : public nav_core::BaseLocalPlanner {
   tf2_ros::Buffer *tf_;  ///<@brief pointer to Transform Listener
   bool goal_reached_;
   bool initialized_;
+  ros::ServiceClient client;
+  int index;
+  bool started = false;
+
   geometry_msgs::PoseStamped current_goal;
   std::vector<geometry_msgs::PoseStamped> orig_global_plan_;
   geometry_msgs::PoseStamped current_pose;

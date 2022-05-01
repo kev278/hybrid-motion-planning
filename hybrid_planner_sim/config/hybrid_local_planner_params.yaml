@@ -7,5 +7,7 @@ HybridLocalPlanner:
   acc_lim_theta: 3.2
   acc_lim_x: 2.5
   acc_lim_y: 2.5
-
+  recovery_behavior_enabled: false
+  clearing_rotation_allowed: false
+  planner_frequency: 0
   holonomic_robot: false
