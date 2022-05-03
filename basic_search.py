@@ -295,8 +295,10 @@ def astar(grid, start, goal, plot_on):
     steps = 0
     found = False
     path, found, steps, node_grid = findPath(start, goal, grid, 1, 0)
+    goal_node = node_grid[goal[0], goal[1]]
     if found:
-        print(f"It takes {steps} steps to find a path using A*")
+        steps = goal_node.cost
+        print(f"It takes {steps} nodes to find a path using A*")
     else:
         print("No path found")
     if (plot_on == "1"):

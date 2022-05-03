@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   actionlib
   rospy
-  custom_srvs
   turtlebot3_gazebo
   message_generation
 )
@@ -132,7 +131,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(move_node src/move_node.cpp)
+##add_executable(move_node src/move_node.cpp)
 
 
 ## Rename C++ executable without prefix
@@ -163,7 +162,7 @@ add_executable(move_node src/move_node.cpp)
 #   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
-target_link_libraries(move_node ${catkin_LIBRARIES})
+# #target_link_libraries(move_node ${catkin_LIBRARIES})
 
 
 ## Mark executables for installation

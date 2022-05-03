@@ -1,5 +1,0 @@
- <library path="lib/libhybrid_local_planner">
-  <class name="hybrid_planner/HybridLocalPlanner" type="hybrid_planner::HybridLocalPlanner" base_class_type="nav_core::BaseLocalPlanner">
-    <description>This is a hybrid local planner plugin by Group 5 Rbe 550</description>
-  </class>
- </library>

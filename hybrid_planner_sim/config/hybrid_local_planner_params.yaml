@@ -1,6 +1,6 @@
-HybridLocalPlanner:
-  max_vel_x: 0.45
-  min_vel_x: 0.1
+DWAPlannerROS:
+  max_vel_x: 1.5
+  min_vel_x: -1.1
   max_vel_theta: 1.0
   min_in_place_vel_theta: 0.4
 
@@ -10,4 +10,4 @@ HybridLocalPlanner:
   recovery_behavior_enabled: false
   clearing_rotation_allowed: false
   planner_frequency: 0
-  holonomic_robot: false
+  holonomic_robot: true

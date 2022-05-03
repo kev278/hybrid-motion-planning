@@ -18,6 +18,8 @@ sudo apt-get install ros-noetic-turtlebot3
 sudo apt-get install ros-noetic-turtlebot3-gazebo
 sudo apt-get install ros-noetic-base-local-planner
 sudo apt-get install ros-noetic-nav-core
+sudo apt-get install ros-noetic-dwa-local-planner
+
 ```
 
 ```sh 

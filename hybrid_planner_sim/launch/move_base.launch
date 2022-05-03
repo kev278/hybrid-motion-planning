@@ -8,7 +8,7 @@
 
     <param name="base_global_planner" value="$(arg base_global_planner)"/>
      <param name="base_local_planner" value="$(arg base_local_planner)"/>  
-    <rosparam file="$(find husky_navigation)/config/planner.yaml" command="load"/>
+    <rosparam file="$(find hybrid_planner_sim)/config/hybrid_local_planner_params.yaml" command="load"/>
 
     <!-- observation sources located in costmap_common.yaml -->
     <rosparam file="$(find hybrid_planner_sim)/config/common_params.yaml" command="load" ns="global_costmap" />

@@ -420,6 +420,7 @@ class RRT:
             length = self.path_cost(self.start, self.goal)
             print("It took %d nodes to find the current paths" %steps)
             print("The path length is %.2f" %length)
+            #print ("The path actual length is %.2f")
         if not self.found:
             print("No path found")
         
