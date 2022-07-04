@@ -5,7 +5,7 @@
 #include <tf2/utils.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include "nav_msgs/GetPlan.h"
-//#include "informed_rrt_star.hpp"
+//#include "informed_rrt_star.h"
 
 // register this planner as a BaseHybridGlobalPlanner plugin
 PLUGINLIB_EXPORT_CLASS(hybrid_planner::HybridGlobalPlanner,
