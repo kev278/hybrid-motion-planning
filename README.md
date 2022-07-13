@@ -57,6 +57,7 @@ roslaunch hybrid_planner_sim  turtlebot3_world.launch
 
 To see an example of planning: 
 
+```sh
 rostopic pub /move_base_simple/goal geometry_msgs/PoseStamped "header:
   seq: 0
   stamp:
@@ -73,5 +74,7 @@ pose:
     y: 0.0
     z: 0.0
     w: 1" 
+    
+    ```
 
 ---
